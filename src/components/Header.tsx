@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { mockUser } from "@/lib/mockData";
+import { Logo } from "@/components/Logo";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -17,18 +18,8 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
       <div className="flex items-center">
         {/* Left side - Branding aligned with sidebar */}
-        <div className="hidden w-64 items-center gap-3 border-r border-slate-200 px-6 py-4 md:flex">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-teal-500 to-blue-500 text-base font-semibold text-white shadow-sm">
-            ₱
-          </span>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight text-slate-900">
-              PH Expense Tracker
-            </div>
-            <div className="text-[10px] text-slate-500">
-              Mock UI • Ready for Supabase
-            </div>
-          </div>
+        <div className="hidden w-64 items-center border-r border-slate-200 px-6 py-4 md:flex">
+          <Logo />
         </div>
 
         {/* Right side - Page title, search, and user info */}

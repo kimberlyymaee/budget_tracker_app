@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/Logo";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -15,19 +16,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-teal-500 to-blue-500 text-sm font-semibold text-white shadow-sm">
-            ₱
-          </span>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight text-slate-900">
-              PH Expense Tracker
-            </div>
-            <div className="text-[11px] text-slate-500">
-              Mock UI • Ready for Supabase
-            </div>
-          </div>
-        </div>
+        <Logo />
         <nav className="hidden items-center gap-4 text-sm font-medium text-slate-600 md:flex">
           {navItems.map((item) => {
             const active = pathname === item.href;

@@ -13,9 +13,49 @@ export default function ExpensesPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  
+  // Year and month filters
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState((currentDate.getMonth() + 1).toString());
 
-  const sortedExpenses = useMemo(() => {
-    return [...mockExpenses].sort((a, b) => {
+  // Get available years and months from expenses
+  const availableYears = useMemo(() => {
+    const years = new Set(mockExpenses.map(e => new Date(e.date).getFullYear()));
+    return Array.from(years).sort((a, b) => b - a);
+  }, []);
+
+  const months = [
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
+
+  const filteredAndSortedExpenses = useMemo(() => {
+    let filtered = [...mockExpenses];
+    
+    // Filter by year and month
+    if (selectedYear && selectedMonth) {
+      filtered = filtered.filter((e) => {
+        const expenseDate = new Date(e.date);
+        return (
+          expenseDate.getFullYear() === parseInt(selectedYear) &&
+          expenseDate.getMonth() + 1 === parseInt(selectedMonth)
+        );
+      });
+    }
+    
+    // Sort
+    return filtered.sort((a, b) => {
       let cmp = 0;
       if (sortKey === "amount") {
         cmp = a.amount - b.amount;
@@ -26,7 +66,7 @@ export default function ExpensesPage() {
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [sortKey, sortDir]);
+  }, [sortKey, sortDir, selectedYear, selectedMonth]);
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -64,96 +104,132 @@ export default function ExpensesPage() {
     }
   };
 
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}-${day}-${year}`;
+  };
+
   return (
     <div className="flex flex-col space-y-5 w-full">
-      {/* Description Section */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-600">
-          Review every transaction in one place. Sorting and actions are ready
-          to be wired to your database.
-        </p>
+      {/* Filter Section */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+            >
+              {availableYears.map((year) => (
+                <option key={year} value={year.toString()}>
+                  {year}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </div>
+          </div>
+          <div className="relative">
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+            >
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </div>
+          </div>
+        </div>
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-transform duration-150 hover:-translate-y-[1px] hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-1"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 hover:from-cyan-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
         >
-          + Add expense
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add expense
         </button>
       </div>
 
-      <div className="flex-1 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-[var(--shadow-soft)]">
+      <div className="flex-1 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[var(--shadow-soft)]">
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-center">
-                  <button
-                    className="flex items-center justify-center gap-1 hover:text-slate-700"
-                    onClick={() => toggleSort("date")}
-                  >
-                    Date <span className="text-[10px]">{sortIcon("date")}</span>
-                  </button>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700">
+                  Date
                 </th>
-                <th className="px-4 py-3 text-left">
-                  <button
-                    className="flex items-center gap-1 hover:text-slate-700"
-                    onClick={() => toggleSort("category")}
-                  >
-                    Category{" "}
-                    <span className="text-[10px]">{sortIcon("category")}</span>
-                  </button>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700">
+                  Category
                 </th>
-                <th className="px-4 py-3 text-left">
-                  <button
-                    className="flex items-center gap-1 hover:text-slate-700"
-                    onClick={() => toggleSort("amount")}
-                  >
-                    Amount{" "}
-                    <span className="text-[10px]">{sortIcon("amount")}</span>
-                  </button>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700">
+                  Amount
                 </th>
-                <th className="px-4 py-3 text-left">Notes</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700">
+                  Notes
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sortedExpenses.map((e) => (
-                <tr
-                  key={e.id}
-                  className="transition-colors hover:bg-slate-50/80"
-                >
-                  <td className="px-4 py-3 text-center font-medium text-slate-900">
-                    {new Date(e.date).toLocaleDateString("en-PH", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </td>
-                  <td className="px-4 py-3 text-left text-slate-800">{e.category}</td>
-                  <td className="px-4 py-3 text-left font-semibold text-slate-900">
-                    {peso(e.amount)}
-                  </td>
-                  <td className="px-4 py-3 text-left text-slate-600">
-                    {e.notes || <span className="text-slate-400">—</span>}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button 
-                        onClick={() => handleEdit(e)}
-                        className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(e)}
-                        className="rounded-md border border-rose-200 px-2 py-1 text-xs text-rose-600 hover:bg-rose-50 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
+              {filteredAndSortedExpenses.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500">
+                    No expenses found for the selected period.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredAndSortedExpenses.map((e) => (
+                  <tr
+                    key={e.id}
+                    className="transition-colors hover:bg-slate-50/50"
+                  >
+                    <td className="px-4 py-3 text-sm text-slate-900">
+                      {formatDateTime(e.date)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-800">{e.category}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-slate-900">
+                      {peso(e.amount)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600">
+                      {e.notes || <span className="text-slate-400">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button 
+                          onClick={() => handleEdit(e)}
+                          className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(e)}
+                          className="rounded-md border border-rose-200 px-2 py-1 text-xs text-rose-600 hover:bg-rose-50 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

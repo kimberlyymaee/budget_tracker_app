@@ -6,6 +6,7 @@ import {
   CategoryPieChart,
   prepareCategoryData,
 } from "@/components/CategoryPieChart";
+import { MonthlyExpenseChartCard } from "@/components/MonthlyExpenseLineChart";
 import { mockExpenses, mockUser, peso } from "@/lib/mockData";
 
 function getCurrentMonthExpenses() {
@@ -39,7 +40,7 @@ export default function DashboardPage() {
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
 
-  const categoryChartData = prepareCategoryData(byCategory);
+  const categoryChartData = prepareCategoryData(byCategory, mockUser.categorySettings);
 
   // Calculate additional metrics
   const remainingBudget = Math.max(0, mockUser.monthlyBudget - totalThisMonth);
@@ -299,6 +300,9 @@ export default function DashboardPage() {
           )}
         </section>
       </div>
+
+      {/* Monthly Expense Chart */}
+      <MonthlyExpenseChartCard expenses={mockExpenses} year={2025} />
 
       {isModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4">

@@ -11,9 +11,8 @@ type CategoryPieChartProps = {
   total: number;
 };
 
-// Flat Orange Blue Green color palette
-// Colors from the provided palette for distinct category visualization
-const categoryColors: Record<string, string> = {
+// Default fallback colors (used when category settings are not available)
+const defaultCategoryColors: Record<string, string> = {
   Food: "#F66D44", // vibrant reddish-orange
   Transport: "#2D87BB", // medium clear blue
   Bills: "#64C2A6", // medium teal/mint green
@@ -122,14 +121,25 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
 
 // Helper function to prepare data for the pie chart
 export function prepareCategoryData(
-  byCategory: Record<string, number>
+  byCategory: Record<string, number>,
+  categorySettings?: Record<string, { color: string; enabled: boolean }>
 ): CategoryData[] {
   return Object.entries(byCategory)
-    .map(([category, amount]) => ({
-      category,
-      amount,
-      color: categoryColors[category] || "#F66D44", // fallback to vibrant orange
-    }))
+    .map(([category, amount]) => {
+      // Use color from category settings if available, otherwise use default colors
+      let color = "#F66D44"; // default fallback
+      if (categorySettings && categorySettings[category]) {
+        color = categorySettings[category].color;
+      } else if (defaultCategoryColors[category]) {
+        color = defaultCategoryColors[category];
+      }
+      
+      return {
+        category,
+        amount,
+        color,
+      };
+    })
     .sort((a, b) => b.amount - a.amount); // Sort by amount descending
 }
 

@@ -18,8 +18,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-sky-50 via-transparent to-slate-50">
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 px-7 py-8 shadow-[var(--shadow-soft)] backdrop-blur">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-sky-50 via-transparent to-slate-50">
+      {/* Animated background elements - floating gradient blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-teal-400/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-blue-400/10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
+      {/* Subtle geometric pattern background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="geometric-pattern-login" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <circle cx="30" cy="30" r="2" fill="none" stroke="#06b6d4" strokeWidth="0.5" opacity="0.3" />
+              <path d="M0 30 L60 30" stroke="#14b8a6" strokeWidth="0.5" opacity="0.2" />
+              <path d="M30 0 L30 60" stroke="#14b8a6" strokeWidth="0.5" opacity="0.2" />
+              <path d="M0 0 L60 60" stroke="#06b6d4" strokeWidth="0.5" opacity="0.15" />
+              <path d="M60 0 L0 60" stroke="#06b6d4" strokeWidth="0.5" opacity="0.15" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#geometric-pattern-login)" />
+        </svg>
+        
+        {/* Additional geometric shapes */}
+        <div className="absolute top-1/4 right-1/4 w-32 h-32 border border-cyan-300/20 rounded-lg rotate-45"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-24 h-24 border border-teal-300/20 rounded-full"></div>
+        <div className="absolute top-1/2 right-1/3 w-16 h-16 border border-blue-300/20 rounded-lg rotate-12"></div>
+      </div>
+
+      {/* Floating peso (₱) symbols with bounce animation */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 text-8xl text-cyan-400/10 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '3s' }}>₱</div>
+        <div className="absolute top-40 right-20 text-7xl text-teal-400/10 animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '2.5s' }}>₱</div>
+        <div className="absolute bottom-20 left-1/4 text-8xl text-blue-400/10 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>₱</div>
+        <div className="absolute top-1/3 right-1/3 text-6xl text-cyan-400/10 animate-bounce" style={{ animationDelay: '0.8s', animationDuration: '2.8s' }}>₱</div>
+        <div className="absolute bottom-1/3 right-1/4 text-7xl text-teal-400/10 animate-bounce" style={{ animationDelay: '1.2s', animationDuration: '3.2s' }}>₱</div>
+        <div className="absolute top-1/2 left-1/5 text-6xl text-blue-400/10 animate-bounce" style={{ animationDelay: '1.8s', animationDuration: '2.8s' }}>₱</div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-7 py-8 shadow-[var(--shadow-soft)]">
         <div className="mb-6 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             Philippine Peso
