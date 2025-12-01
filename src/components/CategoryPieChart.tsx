@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 type CategoryData = {
   category: string;
   amount: number;
@@ -20,6 +22,8 @@ const defaultCategoryColors: Record<string, string> = {
 };
 
 export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
   if (data.length === 0 || total === 0) {
     return (
       <div className="flex h-48 items-center justify-center text-sm text-slate-500">
@@ -68,7 +72,7 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
   });
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+    <div className="flex items-center justify-center gap-4">
       {/* Pie Chart SVG */}
       <div className="flex-shrink-0">
         <svg
@@ -77,40 +81,61 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
           viewBox={`0 0 ${size} ${size}`}
           className="drop-shadow-sm"
         >
-          {segments.map((segment, index) => (
-            <path
-              key={segment.category}
-              d={segment.pathData}
-              fill={segment.color}
-              className="transition-opacity hover:opacity-80"
-            />
-          ))}
+          {segments.map((segment) => {
+            const isHovered = hoveredCategory === segment.category;
+            const midAngle = (segment.startAngle + segment.endAngle) / 2;
+            const midAngleRad = (midAngle * Math.PI) / 180;
+            const offset = isHovered ? 8 : 0;
+            const translateX = Math.cos(midAngleRad) * offset;
+            const translateY = Math.sin(midAngleRad) * offset;
+
+            return (
+              <path
+                key={segment.category}
+                d={segment.pathData}
+                fill={segment.color}
+                onMouseEnter={() => setHoveredCategory(segment.category)}
+                onMouseLeave={() => setHoveredCategory(null)}
+                className="cursor-pointer transition-all duration-200"
+                style={{
+                  transform: `translate(${translateX}px, ${translateY}px)`,
+                  opacity: isHovered ? 0.9 : 0.8,
+                  stroke: isHovered ? "#0f172a" : "transparent",
+                  strokeWidth: isHovered ? 1.5 : 0,
+                }}
+              />
+            );
+          })}
         </svg>
       </div>
 
-      {/* Legend */}
-      <div className="flex-1 space-y-2.5">
+      {/* Percentages */}
+      <div className="flex-shrink-0 space-y-2">
         {data.map((item) => {
           const percentage = ((item.amount / total) * 100).toFixed(1);
           return (
             <div
               key={item.category}
-              className="flex items-center justify-between gap-3"
+              className="flex items-center gap-2 text-xs cursor-pointer"
+              onMouseEnter={() => setHoveredCategory(item.category)}
+              onMouseLeave={() => setHoveredCategory(null)}
             >
-              <div className="flex items-center gap-2">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-xs font-medium text-slate-700">
-                  {item.category}
-                </span>
-              </div>
-              <div className="text-right">
-                <div className="text-xs font-semibold text-slate-900">
-                  {percentage}%
-                </div>
-              </div>
+              <div
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
+              <span 
+                className={`font-semibold transition-colors transition-transform ${
+                  hoveredCategory === item.category
+                    ? "scale-110 drop-shadow-[0_0_6px_rgba(0,0,0,0.25)]"
+                    : ""
+                }`}
+                style={{
+                  color: item.color,
+                }}
+              >
+                {percentage}%
+              </span>
             </div>
           );
         })}

@@ -2,6 +2,7 @@
 
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 
+export default function AddExpensePage() {
   return (
     <div className="space-y-4">
       <div>

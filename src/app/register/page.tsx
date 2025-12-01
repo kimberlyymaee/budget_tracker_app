@@ -16,7 +16,29 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-sky-50 via-transparent to-slate-50">
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 px-7 py-8 shadow-[var(--shadow-soft)] backdrop-blur">
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/90 px-7 py-8 shadow-[var(--shadow-soft)] backdrop-blur">
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          aria-label="Close registration"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-colors hover:text-slate-600 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-1"
+        >
+          <span className="sr-only">Close</span>
+          <svg
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
         <div className="mb-6 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             Philippine Peso

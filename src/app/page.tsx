@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { DeviceMockup } from "@/components/DeviceMockup";
-import { DashboardPreview } from "@/components/DashboardPreview";
 
 export default function Home() {
   const words = ["Finances", "Budget", "Savings", "Life"];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -51,18 +51,20 @@ export default function Home() {
     return cleanup;
   }, []); // Empty dependency array - only run once on mount
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-transparent to-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 via-transparent to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/40 bg-white/70 backdrop-blur-md shadow-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200/40 bg-white/80 backdrop-blur-md shadow-sm dark:border-slate-700/40 dark:bg-slate-900/80">
         <div className="mx-auto max-w-7xl">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center pl-4 lg:pl-12 xl:pl-20">
+            <div className="flex items-center pl-2 sm:pl-4 lg:pl-12 xl:pl-20">
               <Logo />
             </div>
-            <div className="flex items-center gap-6 pr-4 lg:pr-12 xl:pr-20">
+
+            {/* Desktop navigation */}
+            <div className="hidden sm:flex items-center gap-4 sm:gap-6 pr-2 sm:pr-4 lg:pr-12 xl:pr-20">
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors duration-200"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors duration-200 dark:text-slate-400 dark:hover:text-slate-100"
               >
                 Sign In
               </Link>
@@ -73,7 +75,63 @@ export default function Home() {
                 Get Started
               </Link>
             </div>
+
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-full p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 sm:hidden"
+              aria-label="Toggle navigation"
+              onClick={() => setIsNavOpen((open) => !open)}
+            >
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {isNavOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                  </>
+                )}
+              </svg>
+            </button>
           </div>
+
+          {/* Mobile navigation panel */}
+          {isNavOpen && (
+            <div className="sm:hidden border-t border-slate-200/60 bg-white/95 px-4 pb-4 pt-3 shadow-md dark:border-slate-700/60 dark:bg-slate-900/95">
+              <div className="rounded-2xl border border-slate-100 bg-white/90 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+                <div className="mb-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>Already tracking with us?</span>
+                  <Link
+                    href="/login"
+                    className="font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+                    onClick={() => setIsNavOpen(false)}
+                  >
+                    Sign in
+                  </Link>
+                </div>
+                <Link
+                  href="/register"
+                  className="mt-1 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-cyan-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                  onClick={() => setIsNavOpen(false)}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -122,17 +180,17 @@ export default function Home() {
               {/* Social proof badge */}
               <div className="mb-6 flex justify-center lg:justify-start">
                 <div className="flex items-center gap-4">
-                  <div className="h-px w-6 bg-slate-300"></div>
+                  <div className="h-px w-6 bg-slate-300 dark:bg-slate-600"></div>
                   <div className="flex items-center gap-3">
-                    <span className="font-semibold text-slate-900">PHP Budget Tracker</span>
-                    <span className="text-slate-400">•</span>
-                    <span className="text-slate-600">Trusted by 10K+ users</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">PHP Budget Tracker</span>
+                    <span className="text-slate-400 dark:text-slate-500">•</span>
+                    <span className="text-slate-600 dark:text-slate-400">Trusted by 10K+ users</span>
                   </div>
-                  <div className="h-px w-6 bg-slate-300"></div>
+                  <div className="h-px w-6 bg-slate-300 dark:bg-slate-600"></div>
                 </div>
               </div>
               
-              <h1 className="text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl mb-8">
+              <h1 className="text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-6xl lg:text-7xl mb-8">
                 <span className="block animate-fade-in" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
                   Take Control
                 </span>
@@ -149,14 +207,14 @@ export default function Home() {
                     >
                       {words[currentIndex]}
                     </span>
-                    <span className="ml-2 text-slate-900">Today</span>
+                    <span className="ml-2 text-slate-900 dark:text-slate-100">Today</span>
                   </span>
                 </span>
               </h1>
               
-              <p className="text-xl leading-8 text-slate-600 sm:text-2xl max-w-xl mb-8">
+              <p className="text-xl leading-8 text-slate-600 dark:text-slate-400 sm:text-2xl max-w-xl mb-8">
                 Track food, transport, bills, and more — all in one clean, modern dashboard.
-                <span className="block mt-2 text-lg text-slate-500">
+                <span className="block mt-2 text-lg text-slate-500 dark:text-slate-400">
                   Make smarter financial decisions with real-time insights.<span className="ml-1.5">✨</span>
                 </span>
               </p>
@@ -170,7 +228,7 @@ export default function Home() {
                   <span className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-700 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 </Link>
                 <button
-                  className="flex items-center justify-center gap-2 rounded-full border-2 border-slate-300 bg-white/80 backdrop-blur-sm px-6 py-4 text-base font-semibold text-slate-700 shadow-md transition-all duration-300 hover:border-cyan-400 hover:text-cyan-600 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 w-full sm:w-auto"
+                  className="flex items-center justify-center gap-2 rounded-full border-2 border-slate-300 bg-white/80 backdrop-blur-sm px-6 py-4 text-base font-semibold text-slate-700 shadow-md transition-all duration-300 hover:border-cyan-400 hover:text-cyan-600 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 w-full sm:w-auto dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:border-cyan-500 dark:hover:text-cyan-400"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -180,77 +238,104 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Right Side - Device Mockup */}
+            {/* Right Side - Illustration */}
             <div className="relative flex items-center justify-center mt-12 lg:mt-0">
               {/* Feature Card - Top Left */}
-              <div className="absolute top-0 left-0 lg:top-2 lg:left-2 hidden lg:block animate-fade-in animate-float" style={{ animationFillMode: 'both' }}>
-                <div className="bg-white/80 backdrop-blur-md rounded-xl p-3 shadow-lg border border-slate-200/50">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/90 to-teal-500/90 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <div className="absolute top-0 left-0 lg:top-1 lg:left-1 hidden lg:block animate-fade-in animate-float" style={{ animationFillMode: 'both' }}>
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.18)] border border-slate-100/80 dark:bg-slate-800/90 dark:border-slate-700/70 transform -rotate-2 hover:rotate-0 transition-transform duration-300 opacity-80 hover:opacity-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                       </svg>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-800 leading-tight">Secure</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">Bank-level</p>
+                      <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">
+                        Secure
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Bank-level
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Stat Badge - Top Right */}
-              <div className="absolute top-0 right-0 lg:top-2 lg:right-2 hidden lg:block animate-fade-in animate-float-delay-1" style={{ animationFillMode: 'both' }}>
-                <div className="bg-gradient-to-br from-cyan-500/95 to-teal-500/95 rounded-xl px-3 py-2.5 shadow-lg backdrop-blur-sm">
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-white leading-tight">10K+</p>
-                    <p className="text-[10px] text-cyan-50/90 font-medium leading-tight">Active Users</p>
+              <div className="absolute top-0 right-0 lg:top-1 lg:right-1 hidden lg:block animate-fade-in animate-float-delay-1" style={{ animationFillMode: 'both' }}>
+                <div className="bg-gradient-to-br from-cyan-500 to-teal-500 rounded-full px-4 py-2 shadow-[0_18px_45px_rgba(8,145,178,0.35)] backdrop-blur-sm flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity duration-300">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-[11px] font-semibold text-white">
+                    ⭐
+                  </span>
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-white leading-tight">
+                      10K+ users
+                    </p>
+                    <p className="text-[10px] text-cyan-50/90 leading-tight">
+                      and counting
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Mini Card - Bottom Right */}
-              <div className="absolute bottom-0 right-0 lg:bottom-2 lg:right-2 hidden lg:block animate-fade-in animate-float-delay-2" style={{ animationFillMode: 'both' }}>
-                <div className="bg-white/80 backdrop-blur-md rounded-xl p-3 shadow-lg border border-slate-200/50">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/90 to-cyan-500/90 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <div className="absolute bottom-0 right-0 lg:bottom-1 lg:right-1 hidden lg:block animate-fade-in animate-float-delay-2" style={{ animationFillMode: 'both' }}>
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.18)] border border-slate-100/80 dark:bg-slate-800/90 dark:border-slate-700/70 transform rotate-1 hover:rotate-0 transition-transform duration-300 opacity-80 hover:opacity-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
                       </svg>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-800 leading-tight">Real-time</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">Analytics</p>
+                      <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">
+                        Real-time
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Analytics
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Feature Card - Bottom Left */}
-              <div className="absolute bottom-0 left-0 lg:bottom-2 lg:left-2 hidden lg:block animate-fade-in animate-float-delay-3" style={{ animationFillMode: 'both' }}>
-                <div className="bg-white/80 backdrop-blur-md rounded-xl p-3 shadow-lg border border-slate-200/50">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/90 to-pink-500/90 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+              <div className="absolute bottom-0 left-0 lg:bottom-1 lg:left-1 hidden lg:block animate-fade-in animate-float-delay-3" style={{ animationFillMode: 'both' }}>
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-[0_18px_45px_rgba(15,23,42,0.18)] border border-slate-100/80 dark:bg-slate-800/90 dark:border-slate-700/70 transform -rotate-1 hover:rotate-0 transition-transform duration-300 opacity-80 hover:opacity-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-800 leading-tight">Free Plan</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">Available</p>
+                      <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">
+                        Free Plan
+                      </p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Available
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Decorative gradient blob behind device */}
+              {/* Decorative gradient blob behind illustration */}
               <div className="absolute inset-0 -z-10 hidden lg:block">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/20 via-teal-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
               </div>
-              
-              <DeviceMockup>
-                <DashboardPreview />
-              </DeviceMockup>
+
+              {/* Main illustration */}
+              <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                <Image
+                  src="/blueman.png"
+                  alt="Person tracking monthly budget on a tablet"
+                  width={800}
+                  height={800}
+                  priority
+                  className="h-auto w-full drop-shadow-2xl"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -260,18 +345,18 @@ export default function Home() {
       <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
               Everything you need to manage expenses
             </h2>
-            <p className="mt-4 text-lg leading-8 text-slate-600">
+            <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-400">
               Powerful features designed to help you understand and control your spending.
             </p>
           </div>
           <div className="mt-16 grid grid-cols-1 gap-6 sm:mt-20 lg:grid-cols-3 pl-4 lg:pl-12 xl:pl-20 pr-4 lg:pr-12 xl:pr-20">
-            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[var(--shadow-soft)] backdrop-blur">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[0_24px_60px_rgba(8,145,178,0.22)] backdrop-blur dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-[0_24px_60px_rgba(8,145,178,0.35)]">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-900/30">
                 <svg
-                  className="h-5 w-5 text-cyan-600"
+                  className="h-5 w-5 text-cyan-600 dark:text-cyan-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
@@ -284,17 +369,17 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">Track Expenses</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Track Expenses</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Easily record and categorize your daily expenses. Track food, transport, bills,
                 and more with intuitive categories.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[var(--shadow-soft)] backdrop-blur">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[0_24px_60px_rgba(8,145,178,0.22)] backdrop-blur dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-[0_24px_60px_rgba(8,145,178,0.35)]">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-900/30">
                 <svg
-                  className="h-5 w-5 text-cyan-600"
+                  className="h-5 w-5 text-cyan-600 dark:text-cyan-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
@@ -307,17 +392,17 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">Visual Insights</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Visual Insights</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Get a clear picture of your spending patterns with beautiful charts and
                 visualizations. Understand where your money goes.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[var(--shadow-soft)] backdrop-blur">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-[0_24px_60px_rgba(8,145,178,0.22)] backdrop-blur dark:border-slate-700 dark:bg-slate-800/90 dark:shadow-[0_24px_60px_rgba(8,145,178,0.35)]">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-900/30">
                 <svg
-                  className="h-5 w-5 text-cyan-600"
+                  className="h-5 w-5 text-cyan-600 dark:text-cyan-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
@@ -330,8 +415,8 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">Secure & Private</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Secure & Private</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 Your financial data is kept secure and private. Built with modern security
                 practices to protect your information.
               </p>
@@ -382,11 +467,11 @@ export default function Home() {
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md p-12 shadow-[var(--shadow-soft)]">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <div className="rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md p-12 shadow-[var(--shadow-soft)] dark:border-slate-700/60 dark:bg-slate-800/70">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
                 Ready to take control?
               </h2>
-              <p className="mt-4 text-lg leading-8 text-slate-600">
+              <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-400">
                 Join thousands of users managing their finances better every day.
               </p>
               <div className="mt-8 flex items-center justify-center gap-x-6">
@@ -398,7 +483,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/login"
-                  className="text-base font-semibold leading-6 text-slate-700 hover:text-cyan-600 transition-colors"
+                  className="text-base font-semibold leading-6 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
                 >
                   Already have an account?
                 </Link>
@@ -409,10 +494,10 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200/60 bg-white/80 backdrop-blur-sm">
+      <footer className="border-t border-slate-200/60 bg-white/80 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/80">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               © {new Date().getFullYear()} PH Expense Tracker. All rights reserved.
             </p>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import {
   CategoryPieChart,
@@ -8,6 +8,7 @@ import {
 } from "@/components/CategoryPieChart";
 import { MonthlyExpenseChartCard } from "@/components/MonthlyExpenseLineChart";
 import { mockExpenses, mockUser, peso } from "@/lib/mockData";
+import { useDashboardView } from "@/contexts/DashboardViewContext";
 
 function getCurrentMonthExpenses() {
   const now = new Date();
@@ -21,8 +22,46 @@ function getCurrentMonthExpenses() {
 
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { view: dashboardView } = useDashboardView();
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());
+  
+  // Category chart filters
+  const [categoryChartYear, setCategoryChartYear] = useState(currentDate.getFullYear().toString());
+  const [categoryChartMonth, setCategoryChartMonth] = useState((currentDate.getMonth() + 1).toString());
+
+  // Get available years (2023-2025)
+  const availableYears = useMemo(() => {
+    return [2025, 2024, 2023];
+  }, []);
+
+  const months = [
+    { value: "all", label: "All Months" },
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
 
   const currentMonthExpenses = getCurrentMonthExpenses();
+  
+  // Filter expenses for category chart by selected month and year
+  const categoryChartExpenses = useMemo(() => {
+    return mockExpenses.filter((e) => {
+      const expenseDate = new Date(e.date);
+      const yearMatch = categoryChartYear === "all" || expenseDate.getFullYear() === parseInt(categoryChartYear);
+      const monthMatch = categoryChartMonth === "all" || expenseDate.getMonth() + 1 === parseInt(categoryChartMonth);
+      return yearMatch && monthMatch;
+    });
+  }, [categoryChartYear, categoryChartMonth]);
   const totalThisMonth = currentMonthExpenses.reduce(
     (sum, e) => sum + e.amount,
     0
@@ -36,11 +75,30 @@ export default function DashboardPage() {
     {}
   );
 
+  // Category chart data based on filtered expenses
+  const categoryChartByCategory = categoryChartExpenses.reduce<Record<string, number>>(
+    (acc, e) => {
+      acc[e.category] = (acc[e.category] ?? 0) + e.amount;
+      return acc;
+    },
+    {}
+  );
+  
+  const categoryChartTotal = categoryChartExpenses.reduce(
+    (sum, e) => sum + e.amount,
+    0
+  );
+
   const recent = [...mockExpenses]
     .sort((a, b) => (a.date < b.date ? 1 : -1))
     .slice(0, 5);
 
-  const categoryChartData = prepareCategoryData(byCategory, mockUser.categorySettings);
+  const categoryChartData = prepareCategoryData(categoryChartByCategory, mockUser.categorySettings);
+  
+  // Get month name for display
+  const selectedMonthName = categoryChartMonth === "all" 
+    ? "All Months" 
+    : months.find(m => m.value === categoryChartMonth)?.label || "";
 
   // Calculate additional metrics
   const remainingBudget = Math.max(0, mockUser.monthlyBudget - totalThisMonth);
@@ -264,18 +322,71 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="md:col-span-2 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-[var(--shadow-soft)] sm:p-5">
-          <h2 className="mb-4 text-sm font-semibold tracking-tight text-slate-900">
-            This month by category
-          </h2>
+        <section className="md:col-span-2 rounded-3xl border border-slate-200/80 bg-gradient-to-br from-sky-50 via-white to-cyan-50/60 p-[1.5px] shadow-[0_24px_60px_rgba(8,145,178,0.22)] dark:border-slate-700/80 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-cyan-950/20 dark:shadow-[0_28px_80px_rgba(8,145,178,0.45)]">
+          <div className="h-full w-full rounded-2xl bg-white/90 p-4 sm:p-5 dark:bg-slate-900/90">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+            <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+              Expenses by category
+            </h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              See how your spending is distributed across categories.
+            </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {/* Month Dropdown */}
+              <div className="relative">
+                <select
+                  value={categoryChartMonth}
+                  onChange={(e) => setCategoryChartMonth(e.target.value)}
+                  className="appearance-none rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2.5 py-1.5 pr-7 text-xs font-medium text-slate-900 dark:text-slate-100 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                >
+                  {months.map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
+                  <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Year Dropdown */}
+              <div className="relative">
+                <select
+                  value={categoryChartYear}
+                  onChange={(e) => setCategoryChartYear(e.target.value)}
+                  className="appearance-none rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2.5 py-1.5 pr-7 text-xs font-medium text-slate-900 dark:text-slate-100 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                >
+                  <option value="all">All Years</option>
+                  {availableYears.map((year) => (
+                    <option key={year} value={year.toString()}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
+                  <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
           {categoryChartData.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               No expenses recorded for this month in mock data.
             </p>
           ) : (
             <div className="space-y-4">
-              <CategoryPieChart data={categoryChartData} total={totalThisMonth} />
-              <div className="mt-4 space-y-2 border-t border-slate-100 pt-4">
+              <CategoryPieChart
+                data={categoryChartData}
+                total={categoryChartTotal}
+              />
+              <div className="space-y-1.5 border-t border-slate-100 dark:border-slate-700 pt-3">
                 {categoryChartData.map((item) => (
                   <div
                     key={item.category}
@@ -283,14 +394,14 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center gap-2">
                       <div
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-2 w-2 rounded-full flex-shrink-0"
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="font-medium text-slate-700">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">
                         {item.category}
                       </span>
                     </div>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
                       {peso(item.amount)}
                     </span>
                   </div>
@@ -298,11 +409,18 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+          </div>
         </section>
       </div>
 
       {/* Monthly Expense Chart */}
-      <MonthlyExpenseChartCard expenses={mockExpenses} year={2025} />
+      <MonthlyExpenseChartCard 
+        expenses={mockExpenses} 
+        year={parseInt(selectedYear)}
+        availableYears={availableYears}
+        onYearChange={(newYear) => setSelectedYear(newYear.toString())}
+        monthlyBudget={mockUser.monthlyBudget}
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4">

@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { mockUser, peso, type CategorySettings, mockExpenses } from "@/lib/mockData";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useDashboardView } from "@/contexts/DashboardViewContext";
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
+  const { view: dashboardView, setView: setDashboardView } = useDashboardView();
   const [name, setName] = useState(mockUser.name);
   const [email, setEmail] = useState(mockUser.email);
   const [phone, setPhone] = useState(mockUser.phone || "");
-  const [dateFormat, setDateFormat] = useState<"MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD">(mockUser.dateFormat);
   const [budget, setBudget] = useState(String(mockUser.monthlyBudget));
   const [budgetResetDay, setBudgetResetDay] = useState(mockUser.budgetResetDay);
   const [budgetAlertThreshold, setBudgetAlertThreshold] = useState(mockUser.budgetAlertThreshold);
@@ -17,7 +20,10 @@ export default function SettingsPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#6366f1");
   const [notifications, setNotifications] = useState(mockUser.notifications);
-  const [displayPreferences, setDisplayPreferences] = useState(mockUser.displayPreferences);
+  const [displayPreferences, setDisplayPreferences] = useState({
+    ...mockUser.displayPreferences,
+    dashboardView: dashboardView,
+  });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -45,7 +51,6 @@ export default function SettingsPage() {
       name,
       email,
       phone,
-      dateFormat,
       monthlyBudget: budget,
       budgetResetDay,
       budgetAlertThreshold,
@@ -247,33 +252,6 @@ export default function SettingsPage() {
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             />
             <p className="mt-1 text-xs text-slate-500">Optional</p>
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Date Format
-            </label>
-            <div className="space-y-2">
-              {[
-                { value: "MM/DD/YYYY", label: "MM/DD/YYYY (US Format)" },
-                { value: "DD/MM/YYYY", label: "DD/MM/YYYY (European Format)" },
-                { value: "YYYY-MM-DD", label: "YYYY-MM-DD (ISO Format)" },
-              ].map((format) => (
-                <label
-                  key={format.value}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="radio"
-                    name="dateFormat"
-                    value={format.value}
-                    checked={dateFormat === format.value}
-                    onChange={(e) => setDateFormat(e.target.value as "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD")}
-                    className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
-                  />
-                  <span className="text-sm text-slate-700">{format.label}</span>
-                </label>
-              ))}
-            </div>
           </div>
           <div className="space-y-1.5 sm:col-span-2">
             <label className="block text-sm font-medium text-slate-700">
@@ -919,47 +897,48 @@ export default function SettingsPage() {
                       </svg>
                     )
                   },
-                ].map((theme) => (
+                ].map((option) => (
                   <label
-                    key={theme.value}
+                    key={option.value}
                     className={`relative flex items-center gap-3 p-3.5 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      displayPreferences.theme === theme.value
-                        ? "border-cyan-600 bg-cyan-50/50 shadow-md ring-2 ring-cyan-500/20"
-                        : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98]"
+                      theme === option.value
+                        ? "border-cyan-600 bg-cyan-50/50 shadow-md ring-2 ring-cyan-500/20 dark:bg-cyan-950/30 dark:border-cyan-500"
+                        : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800 dark:hover:border-cyan-400"
                     }`}
                   >
                     <input
                       type="radio"
                       name="theme"
-                      value={theme.value}
-                      checked={displayPreferences.theme === theme.value}
-                      onChange={(e) =>
+                      value={option.value}
+                      checked={theme === option.value}
+                      onChange={(e) => {
+                        setTheme(e.target.value as "light" | "dark" | "system");
                         setDisplayPreferences({
                           ...displayPreferences,
                           theme: e.target.value as "light" | "dark" | "system",
-                        })
-                      }
+                        });
+                      }}
                       className="sr-only"
                     />
-                    <div className={`transition-colors duration-200 ${displayPreferences.theme === theme.value ? "text-cyan-600" : "text-slate-500"}`}>
-                      {theme.icon}
+                    <div className={`transition-colors duration-200 ${theme === option.value ? "text-cyan-600" : "text-slate-500 dark:text-slate-400"}`}>
+                      {option.icon}
                     </div>
                     <div className="flex-1">
                     <span className={`text-sm font-semibold block transition-colors duration-200 mb-1.5 ${
-                      displayPreferences.theme === theme.value ? "text-slate-900" : "text-slate-700"
+                      theme === option.value ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"
                     }`}>
-                      {theme.label}
+                      {option.label}
                     </span>
-                      {theme.preview}
+                      {option.preview}
                     </div>
                     <div
                       className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-200 flex-shrink-0 ${
-                        displayPreferences.theme === theme.value
+                        theme === option.value
                           ? "border-cyan-600 bg-cyan-600 ring-2 ring-cyan-500/30"
-                          : "border-slate-300 bg-white"
+                          : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-700"
                       }`}
                     >
-                      {displayPreferences.theme === theme.value && (
+                      {theme === option.value && (
                         <div className="h-2.5 w-2.5 rounded-full bg-white animate-in fade-in duration-200" />
                       )}
                     </div>
@@ -1120,12 +1099,14 @@ export default function SettingsPage() {
                       name="dashboardView"
                       value={view.value}
                       checked={displayPreferences.dashboardView === view.value}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const nextView = e.target.value as "compact" | "detailed";
                         setDisplayPreferences({
                           ...displayPreferences,
-                          dashboardView: e.target.value as "compact" | "detailed",
-                        })
-                      }
+                          dashboardView: nextView,
+                        });
+                        setDashboardView(nextView);
+                      }}
                       className="sr-only"
                     />
                     <div className={`transition-colors duration-200 ${displayPreferences.dashboardView === view.value ? "text-cyan-600" : "text-slate-500"}`}>

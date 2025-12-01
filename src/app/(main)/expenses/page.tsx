@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { mockExpenses, peso, type Expense } from "@/lib/mockData";
 
@@ -13,16 +13,16 @@ export default function ExpensesPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Year and month filters
   const currentDate = new Date();
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState((currentDate.getMonth() + 1).toString());
+  const [selectedYear, setSelectedYear] = useState("all");
+  const [selectedMonth, setSelectedMonth] = useState("all");
 
-  // Get available years and months from expenses
+  // Get available years (2023-2025)
   const availableYears = useMemo(() => {
-    const years = new Set(mockExpenses.map(e => new Date(e.date).getFullYear()));
-    return Array.from(years).sort((a, b) => b - a);
+    return [2025, 2024, 2023];
   }, []);
 
   const months = [
@@ -44,15 +44,12 @@ export default function ExpensesPage() {
     let filtered = [...mockExpenses];
     
     // Filter by year and month
-    if (selectedYear && selectedMonth) {
-      filtered = filtered.filter((e) => {
-        const expenseDate = new Date(e.date);
-        return (
-          expenseDate.getFullYear() === parseInt(selectedYear) &&
-          expenseDate.getMonth() + 1 === parseInt(selectedMonth)
-        );
-      });
-    }
+    filtered = filtered.filter((e) => {
+      const expenseDate = new Date(e.date);
+      const yearMatch = selectedYear === "all" || expenseDate.getFullYear() === parseInt(selectedYear);
+      const monthMatch = selectedMonth === "all" || expenseDate.getMonth() + 1 === parseInt(selectedMonth);
+      return yearMatch && monthMatch;
+    });
     
     // Sort
     return filtered.sort((a, b) => {
@@ -67,6 +64,27 @@ export default function ExpensesPage() {
       return sortDir === "asc" ? cmp : -cmp;
     });
   }, [sortKey, sortDir, selectedYear, selectedMonth]);
+
+  // Reset to first page whenever filters or sorting change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortKey, sortDir, selectedYear, selectedMonth]);
+
+  // Pagination calculations
+  const rowsPerPage = 10;
+  const totalPages =
+    filteredAndSortedExpenses.length === 0
+      ? 1
+      : Math.ceil(filteredAndSortedExpenses.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(
+    startIndex + rowsPerPage,
+    filteredAndSortedExpenses.length
+  );
+  const paginatedExpenses = filteredAndSortedExpenses.slice(
+    startIndex,
+    endIndex
+  );
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -123,6 +141,7 @@ export default function ExpensesPage() {
               onChange={(e) => setSelectedYear(e.target.value)}
               className="appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
             >
+              <option value="all">All Years</option>
               {availableYears.map((year) => (
                 <option key={year} value={year.toString()}>
                   {year}
@@ -141,6 +160,7 @@ export default function ExpensesPage() {
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
             >
+              <option value="all">All Months</option>
               {months.map((month) => (
                 <option key={month.value} value={month.value}>
                   {month.label}
@@ -196,7 +216,7 @@ export default function ExpensesPage() {
                   </td>
                 </tr>
               ) : (
-                filteredAndSortedExpenses.map((e) => (
+              paginatedExpenses.map((e) => (
                   <tr
                     key={e.id}
                     className="transition-colors hover:bg-slate-50/50"
@@ -233,6 +253,61 @@ export default function ExpensesPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination footer */}
+        {filteredAndSortedExpenses.length > 0 && (
+          <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-4 py-2.5 text-xs text-slate-600">
+            <span>
+              Showing{" "}
+              <span className="font-semibold text-slate-800">
+                {startIndex + 1}
+              </span>{" "}
+              –{" "}
+              <span className="font-semibold text-slate-800">
+                {endIndex}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-slate-800">
+                {filteredAndSortedExpenses.length}
+              </span>{" "}
+              expenses
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((page) => Math.max(1, page - 1))
+                }
+                disabled={currentPage === 1}
+                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 hover:border-cyan-400 hover:text-cyan-700 hover:shadow-md"
+              >
+                Previous
+              </button>
+              <span className="text-[11px] text-slate-500">
+                Page{" "}
+                <span className="font-semibold text-slate-800">
+                  {currentPage}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-slate-800">
+                  {totalPages}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentPage((page) =>
+                    Math.min(totalPages, page + 1)
+                  )
+                }
+                disabled={currentPage === totalPages}
+                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 hover:border-cyan-400 hover:text-cyan-700 hover:shadow-md"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Expense Modal */}

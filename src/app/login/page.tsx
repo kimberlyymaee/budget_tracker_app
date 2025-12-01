@@ -18,7 +18,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-sky-50 via-transparent to-slate-50">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-sky-50 via-transparent to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Animated background elements - floating gradient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl animate-pulse"></div>
@@ -57,21 +57,43 @@ export default function LoginPage() {
         <div className="absolute top-1/2 left-1/5 text-6xl text-blue-400/10 animate-bounce" style={{ animationDelay: '1.8s', animationDuration: '2.8s' }}>₱</div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-7 py-8 shadow-[var(--shadow-soft)]">
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-7 py-8 shadow-[var(--shadow-soft)] dark:border-slate-700/60 dark:bg-slate-800/70">
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={() => router.back()}
+          aria-label="Close login"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-colors hover:text-slate-600 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-1"
+        >
+          <span className="sr-only">Close</span>
+          <svg
+            className="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
         <div className="mb-6 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
             Philippine Peso
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Sign in to your dashboard
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Track food, transport, bills, and more — all in one clean view.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-slate-800">
+            <label className="block text-sm font-medium text-slate-800 dark:text-slate-200">
               Email
             </label>
             <input
@@ -79,12 +101,12 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:placeholder:text-slate-500"
               placeholder="you@example.com"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-slate-800">
+            <label className="block text-sm font-medium text-slate-800 dark:text-slate-200">
               Password
             </label>
             <input
@@ -92,7 +114,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100 dark:placeholder:text-slate-500"
               placeholder="••••••••"
             />
           </div>
@@ -103,11 +125,11 @@ export default function LoginPage() {
             Login
           </button>
         </form>
-        <p className="mt-5 text-xs text-slate-500 text-center">
+        <p className="mt-5 text-xs text-slate-500 dark:text-slate-400 text-center">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-medium text-cyan-700 hover:text-cyan-800"
+            className="font-medium text-cyan-700 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-300"
           >
             Register
           </Link>

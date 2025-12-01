@@ -15,6 +15,7 @@ type MonthlyExpenseLineChartProps = {
   showArea?: boolean;
   showGrid?: boolean;
   showTooltip?: boolean;
+  monthlyBudget?: number; // still accepted (for potential highlighting), but scale is now fixed
 };
 
 // Helper function to aggregate expenses by month
@@ -67,16 +68,10 @@ type MonthlyExpenseChartCardProps = {
   showArea?: boolean;
   showGrid?: boolean;
   showTooltip?: boolean;
-};
-
-type MonthlyExpenseChartCardProps = {
-  expenses: Expense[];
-  year?: number;
-  height?: number;
-  showArea?: boolean;
-  showGrid?: boolean;
-  showTooltip?: boolean;
   isLoading?: boolean;
+  availableYears?: number[];
+  onYearChange?: (year: number) => void;
+  monthlyBudget?: number;
 };
 
 export function MonthlyExpenseChartCard({
@@ -87,6 +82,9 @@ export function MonthlyExpenseChartCard({
   showGrid = true,
   showTooltip = true,
   isLoading = false,
+  availableYears = [new Date().getFullYear()],
+  onYearChange,
+  monthlyBudget,
 }: MonthlyExpenseChartCardProps) {
   const monthlyData = aggregateExpensesByMonth(expenses, year);
   
@@ -118,7 +116,7 @@ export function MonthlyExpenseChartCard({
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold tracking-tight text-slate-900">
-              Monthly Expenses - {year}
+              Yearly Expenses - {year}
             </h2>
             <p className="mt-1 text-xs text-slate-500">
               Track your spending trends throughout the year
@@ -159,17 +157,42 @@ export function MonthlyExpenseChartCard({
   );
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-[var(--shadow-soft)] sm:p-5">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 p-4 shadow-[var(--shadow-soft)] sm:p-5">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight text-slate-900">
-            Monthly Expenses - {year}
+          <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            Yearly Expenses
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Track your spending trends throughout the year
           </p>
         </div>
+        {availableYears.length > 1 && (
+          <div className="relative">
+            <select
+              value={year}
+              onChange={(e) => {
+                const newYear = parseInt(e.target.value);
+                if (onYearChange) {
+                  onYearChange(newYear);
+                }
+              }}
+              className="appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-10 text-sm font-medium text-slate-900 shadow-sm transition-all duration-200 hover:border-cyan-400 hover:shadow-md focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100"
+            >
+              {availableYears.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Chart */}
@@ -180,32 +203,33 @@ export function MonthlyExpenseChartCard({
           showArea={showArea}
           showGrid={showGrid}
           showTooltip={showTooltip}
+          monthlyBudget={monthlyBudget}
         />
       </div>
 
       {/* Footer Stats */}
-      <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 border-t border-slate-100 dark:border-slate-700 pt-4 sm:grid-cols-4">
         <div>
-          <div className="text-xs font-medium text-slate-500">Total Year</div>
-          <div className="mt-1 text-sm font-semibold text-slate-900">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Year</div>
+          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {peso(totalYear)}
           </div>
         </div>
         <div>
-          <div className="text-xs font-medium text-slate-500">Monthly Average</div>
-          <div className="mt-1 text-sm font-semibold text-slate-900">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Monthly Average</div>
+          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {peso(averageMonthly)}
           </div>
         </div>
         <div>
-          <div className="text-xs font-medium text-slate-500">Highest Month</div>
-          <div className="mt-1 text-sm font-semibold text-slate-900">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Highest Month</div>
+          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {highestMonth.month}: {peso(highestMonth.amount)}
           </div>
         </div>
         <div>
-          <div className="text-xs font-medium text-slate-500">Lowest Month</div>
-          <div className="mt-1 text-sm font-semibold text-slate-900">
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Lowest Month</div>
+          <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
             {lowestMonth.month}: {peso(lowestMonth.amount)}
           </div>
         </div>
@@ -283,9 +307,10 @@ export function MonthlyExpenseLineChart({
   const chartHeight = height - padding.top - padding.bottom;
 
   // Calculate scales
-  const maxAmount = Math.max(...data.map((d) => d.amount), 0);
-  const minAmount = 0; // Start from 0 for better visualization
-  const range = maxAmount - minAmount || 1; // Avoid division by zero
+  // Fixed scale: top at ₱10,000, decreasing by ₱2,000 downwards, bottom at ₱0
+  const minAmount = 0;
+  const maxAmount = 10000;
+  const range = maxAmount - minAmount; // 10,000 range
   
   const yScale = (value: number) =>
     chartHeight - ((value - minAmount) / range) * chartHeight;
@@ -458,15 +483,23 @@ export function MonthlyExpenseLineChart({
 
         {/* Y-axis labels (currency) - responsive font size */}
         <g className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-medium text-slate-600`}>
-          {[0, 1, 2, 3, 4].map((i) => {
-            const value = minAmount + (range / 4) * i;
+          {[
+            10000, // top
+            8000,
+            6000,
+            4000,
+            2000,
+            0,     // bottom
+          ].map((value) => {
             const y = padding.top + yScale(value);
-            const formattedValue = isMobile && value >= 1000 
-              ? `₱${(value / 1000).toFixed(1)}K` 
-              : peso(value);
+            const formattedValue =
+              isMobile && value >= 1000
+                ? `₱${(value / 1000).toFixed(1)}K`
+                : peso(value);
+
             return (
               <text
-                key={i}
+                key={value}
                 x={padding.left - 10}
                 y={y + 4}
                 textAnchor="end"
