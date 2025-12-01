@@ -114,7 +114,7 @@ export default function DashboardPage() {
     : null;
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 px-4 sm:px-6 w-full max-w-full mx-auto">
       {/* Description Section */}
       <div>
         <p className="text-sm text-slate-600">
@@ -124,22 +124,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Additional Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid w-full max-w-full grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Remaining Budget Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-full rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-3 shadow-[var(--shadow-soft)] sm:px-4 sm:py-4">
+          <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Remaining Budget
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">
+              <p className="mt-2 text-xl font-semibold text-slate-900 sm:text-2xl">
                 {peso(remainingBudget)}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 {budgetPercentage.toFixed(1)}% used
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+            <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
               <svg
                 className="h-6 w-6 text-emerald-600"
                 fill="none"
@@ -156,20 +156,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Average Daily Spending Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-full rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-3 shadow-[var(--shadow-soft)] sm:px-4 sm:py-4">
+          <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Avg Daily Spending
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">
+              <p className="mt-2 text-xl font-semibold text-slate-900 sm:text-2xl">
                 {peso(averageDailySpending)}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 Projected: {peso(projectedMonthlySpending)}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+            <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
               <svg
                 className="h-6 w-6 text-blue-600"
                 fill="none"
@@ -186,20 +186,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Top Category Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-full rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-3 shadow-[var(--shadow-soft)] sm:px-4 sm:py-4">
+          <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Top Category
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">
+              <p className="mt-2 text-xl font-semibold text-slate-900 sm:text-2xl">
                 {topCategory ? topCategory.category : "—"}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 {topCategory ? peso(topCategory.amount) : "No data"}
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+            <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
               <svg
                 className="h-6 w-6 text-amber-600"
                 fill="none"
@@ -216,20 +216,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Total Transactions Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-full rounded-2xl border border-slate-200 bg-white/80 px-2.5 py-3 shadow-[var(--shadow-soft)] sm:px-4 sm:py-4">
+          <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Total Transactions
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">
+              <p className="mt-2 text-xl font-semibold text-slate-900 sm:text-2xl">
                 {currentMonthExpenses.length}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 This month
               </p>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+            <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
               <svg
                 className="h-6 w-6 text-purple-600"
                 fill="none"
@@ -247,13 +247,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Total Expense Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white/80 px-5 py-4 shadow-[var(--shadow-soft)]">
+      <div className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-4 shadow-[var(--shadow-soft)] sm:px-5">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               Total spent this month
             </p>
-            <p className="mt-1 text-3xl font-semibold text-slate-900">
+            <p className="mt-1 text-2xl font-semibold text-slate-900 sm:text-3xl">
               {peso(totalThisMonth)}
             </p>
             <p className="mt-1 text-xs text-slate-500">

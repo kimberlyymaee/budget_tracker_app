@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsAuthLoading(true);
     // Placeholder for future Supabase auth
     console.log("Login submitted", { email, password });
     // Mock successful login: send user to dashboard
@@ -19,6 +22,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-sky-50 via-transparent to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {isAuthLoading && <AuthLoadingScreen mode="login" />}
       {/* Animated background elements - floating gradient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl animate-pulse"></div>
@@ -57,7 +61,7 @@ export default function LoginPage() {
         <div className="absolute top-1/2 left-1/5 text-6xl text-blue-400/10 animate-bounce" style={{ animationDelay: '1.8s', animationDuration: '2.8s' }}>₱</div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-7 py-8 shadow-[var(--shadow-soft)] dark:border-slate-700/60 dark:bg-slate-800/70">
+      <div className="relative z-10 w-full max-w-md rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-7 py-8 shadow-[var(--shadow-soft)] transform scale-[0.8] sm:scale-100 dark:border-slate-700/60 dark:bg-slate-800/70">
         {/* Close button */}
         <button
           type="button"

@@ -296,7 +296,9 @@ export function MonthlyExpenseLineChart({
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  const width = Math.max(containerWidth, 600); // Minimum width of 600px
+  // Use the actual container width so the chart stays within the viewport on mobile.
+  // Clamp to a reasonable range for larger screens.
+  const width = Math.min(Math.max(containerWidth, 320), 960);
   const padding = { 
     top: 40, 
     right: isMobile ? 20 : 40, 
@@ -439,14 +441,17 @@ export function MonthlyExpenseLineChart({
             const y = yScale(d.amount);
             const isHovered = hoveredIndex === i;
             const shouldShow = i < Math.ceil(data.length * animationProgress);
+            const baseRadius = isMobile ? 3 : 4;
+            const hoverRadius = isMobile ? 5 : 7;
+            const hitRadius = isMobile ? 20 : 16;
             
             return (
               <g key={i}>
-                {/* Invisible larger hit area for easier hovering */}
+                {/* Invisible larger hit area for easier hovering / tapping */}
                 <circle
                   cx={x}
                   cy={y}
-                  r="16"
+                  r={hitRadius}
                   fill="transparent"
                   stroke="transparent"
                   strokeWidth="4"
@@ -465,10 +470,10 @@ export function MonthlyExpenseLineChart({
                 <circle
                   cx={x}
                   cy={y}
-                  r={isHovered ? "7" : "4"}
+                  r={isHovered ? hoverRadius : baseRadius}
                   fill={isHovered ? "#0891b2" : "#06b6d4"}
                   stroke="white"
-                  strokeWidth={isHovered ? "3" : "2"}
+                  strokeWidth={isMobile ? (isHovered ? 2 : 1.5) : isHovered ? 3 : 2}
                   className="transition-all duration-200 pointer-events-none"
                   style={{
                     opacity: shouldShow ? 1 : 0,

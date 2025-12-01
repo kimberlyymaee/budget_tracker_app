@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useState } from "react";
 import { mockUser } from "@/lib/mockData";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { AuthLoadingScreen } from "@/components/AuthLoadingScreen";
 
 const navItems = [
   {
@@ -60,35 +62,20 @@ const navItems = [
   },
 ];
 
-export function Sidebar() {
+type SidebarProps = {
+  isMobileOpen: boolean;
+  setIsMobileOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+export function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps) {
   const pathname = usePathname();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const router = useRouter();
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   return (
     <>
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed left-4 top-[77px] z-50 rounded-lg border border-slate-200 bg-white p-2 shadow-md md:hidden"
-        aria-label="Toggle menu"
-      >
-        <svg
-          className="h-6 w-6 text-slate-700"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          {isMobileOpen ? (
-            <path d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
-
+      {isAuthLoading && <AuthLoadingScreen mode="logout" />}
       {/* Mobile overlay */}
       {isMobileOpen && (
         <div
@@ -99,7 +86,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-[65px] z-40 h-[calc(100vh-65px)] w-64 transform border-r border-slate-200 bg-white/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed left-0 top-0 bottom-0 z-40 w-64 transform border-r border-slate-200 bg-white/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:top-[65px] md:bottom-0 md:translate-x-0 ${
           isMobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -150,9 +137,9 @@ export function Sidebar() {
             </div>
 
             {/* Logout button */}
-            <Link
-              href="/login"
-              onClick={() => setIsMobileOpen(false)}
+            <button
+              type="button"
+              onClick={() => setIsLogoutOpen(true)}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
             >
               <svg
@@ -167,10 +154,25 @@ export function Sidebar() {
                 <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               <span>Logout</span>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
+
+      <ConfirmDialog
+        open={isLogoutOpen}
+        title="Log out?"
+        description="You will be redirected to the landing page. This is a demo app, so your mock data will remain unchanged."
+        confirmLabel="Log out"
+        cancelLabel="Cancel"
+        onCancel={() => setIsLogoutOpen(false)}
+        onConfirm={() => {
+          setIsLogoutOpen(false);
+          setIsMobileOpen(false);
+          setIsAuthLoading(true);
+          router.push("/");
+        }}
+      />
     </>
   );
 }

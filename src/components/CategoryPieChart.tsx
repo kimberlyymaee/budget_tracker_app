@@ -24,6 +24,10 @@ const defaultCategoryColors: Record<string, string> = {
 export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
+  const activateCategory = (category: string) => {
+    setHoveredCategory((current) => (current === category ? null : category));
+  };
+
   if (data.length === 0 || total === 0) {
     return (
       <div className="flex h-48 items-center justify-center text-sm text-slate-500">
@@ -96,6 +100,7 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
                 fill={segment.color}
                 onMouseEnter={() => setHoveredCategory(segment.category)}
                 onMouseLeave={() => setHoveredCategory(null)}
+                onClick={() => activateCategory(segment.category)}
                 className="cursor-pointer transition-all duration-200"
                 style={{
                   transform: `translate(${translateX}px, ${translateY}px)`,
@@ -106,6 +111,37 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
               />
             );
           })}
+
+          {/* Center label showing hovered category + percentage */}
+          {hoveredCategory && (() => {
+            const hovered = segments.find(
+              (segment) => segment.category === hoveredCategory
+            );
+            if (!hovered) return null;
+
+            const percentLabel = `${(hovered.percentage * 100).toFixed(1)}%`;
+
+            return (
+              <foreignObject
+                x={center - 45}
+                y={center - 22}
+                width={90}
+                height={44}
+                style={{ pointerEvents: "none" }}
+              >
+                <div className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-white/95 px-2 py-1 text-[10px] shadow-sm ring-1"
+                  style={{ borderColor: hovered.color, color: hovered.color }}
+                >
+                  <span className="font-semibold">
+                    {hovered.category}
+                  </span>
+                  <span className="text-[9px] font-medium opacity-80">
+                    {percentLabel} of total
+                  </span>
+                </div>
+              </foreignObject>
+            );
+          })()}
         </svg>
       </div>
 
@@ -119,6 +155,7 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
               className="flex items-center gap-2 text-xs cursor-pointer"
               onMouseEnter={() => setHoveredCategory(item.category)}
               onMouseLeave={() => setHoveredCategory(null)}
+              onClick={() => activateCategory(item.category)}
             >
               <div
                 className="h-2 w-2 rounded-full"

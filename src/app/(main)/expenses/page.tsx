@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AddExpenseForm } from "@/components/AddExpenseForm";
 import { mockExpenses, peso, type Expense } from "@/lib/mockData";
 
@@ -19,6 +20,9 @@ export default function ExpensesPage() {
   const currentDate = new Date();
   const [selectedYear, setSelectedYear] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState("all");
+
+  const searchParams = useSearchParams();
+  const query = (searchParams.get("query") || "").toLowerCase();
 
   // Get available years (2023-2025)
   const availableYears = useMemo(() => {
@@ -43,12 +47,16 @@ export default function ExpensesPage() {
   const filteredAndSortedExpenses = useMemo(() => {
     let filtered = [...mockExpenses];
     
-    // Filter by year and month
+    // Filter by year, month, and search query
     filtered = filtered.filter((e) => {
       const expenseDate = new Date(e.date);
       const yearMatch = selectedYear === "all" || expenseDate.getFullYear() === parseInt(selectedYear);
       const monthMatch = selectedMonth === "all" || expenseDate.getMonth() + 1 === parseInt(selectedMonth);
-      return yearMatch && monthMatch;
+      const matchesQuery =
+        !query ||
+        e.category.toLowerCase().includes(query) ||
+        (e.notes ?? "").toLowerCase().includes(query);
+      return yearMatch && monthMatch && matchesQuery;
     });
     
     // Sort
@@ -63,7 +71,7 @@ export default function ExpensesPage() {
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [sortKey, sortDir, selectedYear, selectedMonth]);
+  }, [sortKey, sortDir, selectedYear, selectedMonth, query]);
 
   // Reset to first page whenever filters or sorting change
   useEffect(() => {

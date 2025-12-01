@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { mockUser, peso, type CategorySettings, mockExpenses } from "@/lib/mockData";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDashboardView } from "@/contexts/DashboardViewContext";
 
@@ -34,6 +35,7 @@ export default function SettingsPage() {
   const [dataManagementFeedback, setDataManagementFeedback] = useState<string | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [lastBackupDate, setLastBackupDate] = useState<string | null>(null);
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
 
   const showNotificationFeedback = (message: string) => {
     setNotificationFeedback(message);
@@ -1317,6 +1319,48 @@ export default function SettingsPage() {
                 </label>
               </div>
             </div>
+
+            {/* Danger Zone */}
+            <div className="rounded-xl border border-rose-100 bg-rose-50/60 shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-200 p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="text-rose-500">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v4m0 4h.01M4.293 4.293l15.414 15.414M9.88 9.88L5.636 14.122a2 2 0 002.828 2.828L12 13.414l3.536 3.536a2 2 0 002.828-2.828L14.122 9.88M9 4h6l1 2H8l1-2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-rose-800">
+                    Danger zone
+                  </h4>
+                  <p className="text-xs text-rose-700/80">
+                    Permanently clear all mock expenses and settings from this browser.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDeleteAllOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 transition-colors duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 7h12M10 11v6m4-6v6M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m2 0v12a2 2 0 01-2 2H7a2 2 0 01-2-2V7h14z"
+                  />
+                </svg>
+                Delete all data (demo)
+              </button>
+              <p className="mt-2 text-[11px] text-rose-700/80">
+                This only affects mock data stored in your browser. No real accounts are touched.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -1335,6 +1379,26 @@ export default function SettingsPage() {
           )}
         </div>
       </form>
+
+      <ConfirmDialog
+        open={isDeleteAllOpen}
+        title="Delete all data?"
+        description={
+          <p>
+            This will clear all <span className="font-semibold">mock expenses and settings</span> stored in your browser for this demo. You can refresh the
+            page to restore the original mock data from the app.
+          </p>
+        }
+        confirmLabel="Delete everything"
+        cancelLabel="Cancel"
+        onCancel={() => setIsDeleteAllOpen(false)}
+        onConfirm={() => {
+          setIsDeleteAllOpen(false);
+          // In a real app you would clear persisted data here.
+          console.log("All mock data deleted (demo only)");
+          showDataManagementFeedback("All mock data cleared for this demo session");
+        }}
+      />
 
       {/* Privacy & Security Modal */}
       {showPrivacyModal && (
